@@ -30,13 +30,19 @@ class ChirpController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|Response
     {
         $validated = $request->validate([
             'message' => 'required|string|max:255',
         ]);
 
-        $request->user()->chirps()->create($validated);
+        $chirp = $request->user()->chirps()->create($validated);
+
+        if($request->header('HX-Request')) {
+            return response()->view('components.chirps.single', [
+                'chirp' => $chirp,
+            ]);
+        }
 
         return redirect()->route('chirps.index');
     }
@@ -94,11 +100,15 @@ class ChirpController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Chirp $chirp): RedirectResponse
+    public function destroy(Request $request, Chirp $chirp): RedirectResponse|string
     {
         $this->authorize('delete', $chirp);
 
         $chirp->delete();
+
+        if($request->header('HX-Request')) {
+            return '';
+        }
 
         return redirect(route('chirps.index'));
     }
