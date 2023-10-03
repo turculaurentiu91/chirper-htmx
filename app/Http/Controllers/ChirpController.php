@@ -44,17 +44,25 @@ class ChirpController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Chirp $chirp)
+    public function show(Chirp $chirp): Response
     {
-        //
+        return response()->view('components.chirps.single', [
+            'chirp' => $chirp,
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Chirp $chirp): Response
+    public function edit(Request $request, Chirp $chirp): Response
     {
         $this->authorize('update', $chirp);
+
+        if($request->header('HX-Request')) {
+            return response()->view('components.chirps.edit', [
+                'chirp' => $chirp,
+            ]);
+        }
 
         return response()->view('chirps.edit', [
             'chirp' => $chirp,
@@ -64,7 +72,7 @@ class ChirpController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Chirp $chirp): RedirectResponse
+    public function update(Request $request, Chirp $chirp): RedirectResponse|Response
     {
         $this->authorize('update', $chirp);
 
@@ -73,6 +81,12 @@ class ChirpController extends Controller
         ]);
 
         $chirp->update($validated);
+
+        if($request->header('HX-Request')) {
+            return response()->view('components.chirps.single', [
+                'chirp' => $chirp,
+            ]);
+        }
 
         return redirect(route('chirps.index'));
     }
