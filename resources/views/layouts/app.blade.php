@@ -12,7 +12,11 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css'])
+
+        <style>
+            [x-cloak] { display: none !important; }
+        </style>
 
         <script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
     </head>
@@ -34,5 +38,7 @@
                 {{ $slot }}
             </main>
         </div>
+
+    @vite('resources/js/app.js')
     </body>
 </html>

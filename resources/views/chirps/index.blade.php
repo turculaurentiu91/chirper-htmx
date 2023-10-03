@@ -18,10 +18,29 @@
             <x-primary-button class="mt-4">{{ __('Chirp') }}</x-primary-button>
         </form>
 
-        <div id="chirps" class="mt-6 bg-white shadow-sm rounded-lg divide-y">
+        <div x-data="{noscriptFix: true}" id="chirps" class="mt-6 bg-white shadow-sm rounded-lg divide-y">
             @foreach ($chirps as $chirp)
                 <x-chirps.single :chirp="$chirp" />
             @endforeach
+
+            @if($chirps->nextPageUrl())
+                        <div
+                            hx-get="{{ $chirps->nextPageUrl() }}"
+                            hx-select="#chirps>div"
+                            hx-swap="outerHTML"
+                            hx-trigger="intersect"
+                            x-cloak
+                            x-if="noscriptFix"
+                        >
+                            Loading more...
+                        </div>
+            @endif
         </div>
     </div>
+
+    <noscript>
+        <div class="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
+            {{ $chirps->links() }}
+        </div>
+    </noscript>
 </x-app-layout>
