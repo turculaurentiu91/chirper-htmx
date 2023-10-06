@@ -21,6 +21,27 @@ class ChirpController extends Controller
         ]);
     }
 
+    public function pool(Request $request): Response
+    {
+        $validated = $request->validate([
+            'latest_from' => 'required|date',
+        ]);
+
+        $chirps = Chirp::with('user')
+            ->where('created_at', '>', $validated['latest_from'])
+            ->where('user_id', '!=', $request->user()->id)
+            ->latest()
+            ->get();
+
+        if($chirps->count() === 0) {
+            return \response()->noContent();
+        }
+
+        return \response()->view('chirps.pool', [
+            'chirps' => $chirps,
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
