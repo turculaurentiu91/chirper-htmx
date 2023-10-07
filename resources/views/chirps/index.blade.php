@@ -30,11 +30,12 @@
             @if($chirps->nextPageUrl())
                         <div
                             hx-get="{{ $chirps->nextPageUrl() }}"
-                            hx-select="#chirps>div"
+                            hx-select="#chirps>div.chirp,#chirps>div.chirps-paginator"
                             hx-swap="outerHTML"
                             hx-trigger="intersect"
                             x-cloak
                             x-if="noscriptFix"
+                            class="chirps-paginator"
                         >
                             Loading more...
                         </div>
