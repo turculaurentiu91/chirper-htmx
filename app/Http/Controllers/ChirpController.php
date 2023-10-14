@@ -12,9 +12,13 @@ class ChirpController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $chirps = Chirp::with('user')->latest()->paginate(25);
+
+        $chirps = Chirp::with('user')
+            ->latest()
+            ->when($request->has('search'), fn($query) => $query->search($request->query('search')))
+            ->paginate(25);
 
         return \response()->view('chirps.index', [
             'chirps' => $chirps
@@ -30,6 +34,7 @@ class ChirpController extends Controller
         $chirps = Chirp::with('user')
             ->where('created_at', '>', $validated['latest_from'])
             ->where('user_id', '!=', $request->user()->id)
+            ->when($request->has('search'), fn($query) => $query->search($request->query('search')))
             ->latest()
             ->get();
 
