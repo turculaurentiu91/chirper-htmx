@@ -45,7 +45,11 @@
                             @method('delete')
                             <x-dropdown-link
                                 :component="'button'"
-                                type="submit">
+                                type="submit"
+                                hx-get="{{ route('chirps.confirm-destroy', $chirp) }}"
+                                hx-swap="beforeend"
+                                hx-target="closest .chirp"
+                            >
                                 {{ __('Delete') }}
                             </x-dropdown-link>
                         </form>

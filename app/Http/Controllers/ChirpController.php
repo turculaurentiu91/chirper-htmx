@@ -163,4 +163,11 @@ class ChirpController extends Controller
 
         return redirect(route('chirps.index'));
     }
+
+    public function confirmDestroy(Chirp $chirp): Response
+    {
+        return response()->view('components.chirps.confirm-destroy', [
+            'chirp' => $chirp,
+        ]);
+    }
 }
