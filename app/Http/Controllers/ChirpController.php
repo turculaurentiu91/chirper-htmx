@@ -6,6 +6,7 @@ use App\Models\Chirp;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 
 class ChirpController extends Controller
 {
@@ -38,7 +39,7 @@ class ChirpController extends Controller
             ->latest()
             ->get();
 
-        if($chirps->count() === 0) {
+        if ($chirps->count() === 0) {
             return \response()->noContent();
         }
 
@@ -60,19 +61,30 @@ class ChirpController extends Controller
      */
     public function store(Request $request): RedirectResponse|Response
     {
-        $validated = $request->validate([
-            'message' => 'required|string|max:255',
-        ]);
+        try {
+            $validated = $request->validate([
+                'message' => 'required|string|max:255',
+            ]);
 
-        $chirp = $request->user()->chirps()->create($validated);
+            $chirp = $request->user()->chirps()->create($validated);
 
-        if($request->header('HX-Request')) {
-            return response()->view('components.chirps.single', [
-                'chirp' => $chirp,
+            if ($request->header('HX-Request')) {
+                return response()->view('components.chirps.single', [
+                    'chirp' => $chirp,
+                    'withCreateForm' => true,
+                ]);
+            }
+
+            return redirect()->route('chirps.index');
+        } catch (ValidationException $e) {
+            if (!$request->header('HX-Request')) {
+                throw $e;
+            }
+
+            return response()->view('components.chirps.create', [
+                'errors' => collect($e->errors()),
             ]);
         }
-
-        return redirect()->route('chirps.index');
     }
 
     /**
@@ -92,7 +104,7 @@ class ChirpController extends Controller
     {
         $this->authorize('update', $chirp);
 
-        if($request->header('HX-Request')) {
+        if ($request->header('HX-Request')) {
             return response()->view('components.chirps.edit', [
                 'chirp' => $chirp,
             ]);
@@ -110,19 +122,30 @@ class ChirpController extends Controller
     {
         $this->authorize('update', $chirp);
 
-        $validated = $request->validate([
-            'message' => 'required|string|max:255',
-        ]);
+        try {
+            $validated = $request->validate([
+                'message' => 'required|string|max:255',
+            ]);
 
-        $chirp->update($validated);
+            $chirp->update($validated);
 
-        if($request->header('HX-Request')) {
-            return response()->view('components.chirps.single', [
+            if ($request->header('HX-Request')) {
+                return response()->view('components.chirps.single', [
+                    'chirp' => $chirp,
+                ]);
+            }
+
+            return redirect(route('chirps.index'));
+        } catch (ValidationException $e) {
+            if (!$request->header('HX-Request')) {
+                throw $e;
+            }
+
+            return response()->view('components.chirps.edit', [
                 'chirp' => $chirp,
+                'errors' => collect($e->errors()),
             ]);
         }
-
-        return redirect(route('chirps.index'));
     }
 
     /**
@@ -134,7 +157,7 @@ class ChirpController extends Controller
 
         $chirp->delete();
 
-        if($request->header('HX-Request')) {
+        if ($request->header('HX-Request')) {
             return '';
         }
 
