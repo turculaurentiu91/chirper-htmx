@@ -30,7 +30,7 @@
             </button>
         </form>
 
-        <x-chirps.create></x-chirps.create>
+        <x-chirps.create :oob="false"></x-chirps.create>
 
         <div x-data="{noscriptFix: true}" id="chirps" class="mt-6 bg-white shadow-sm rounded-lg divide-y">
             @if($chirps->count() > 0)

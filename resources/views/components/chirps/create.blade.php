@@ -1,6 +1,10 @@
+@props(['oob' => true])
+
 <form
     id="chirps-create"
-    hx-swap-oob="true"
+    @if($oob)
+        hx-swap-oob="true"
+    @endif
     method="POST"
     action="{{ route('chirps.store') }}"
     hx-post="{{ route('chirps.store') }}"
